@@ -31,8 +31,8 @@ PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 TESTS_DIR = os.path.join(PROJECT_ROOT, "tests")
 BUILD_DIR = os.path.join(PROJECT_ROOT, "build")
 DEFAULT_BLENDER = os.environ.get("BLENDER_EXE", "blender")
-LEGACY_ZIP = os.path.join(BUILD_DIR, "stylized_texture_addon-legacy.zip")
-EXTENSION_ZIP = os.path.join(BUILD_DIR, "stylized_texture_addon-extension.zip")
+LEGACY_ZIP = os.path.join(BUILD_DIR, "stylizetex-legacy.zip")
+EXTENSION_ZIP = os.path.join(BUILD_DIR, "stylizetex-extension.zip")
 
 
 def run(command: list[str], *, env=None, cwd: str = PROJECT_ROOT):
@@ -83,7 +83,7 @@ def main(argv: list[str] | None = None) -> int:
         blender = shutil.which(blender) or shutil.which("blender") or blender
 
     results: list[tuple[str, str]] = []
-    workdir = tempfile.mkdtemp(prefix="stylized_tests_")
+    workdir = tempfile.mkdtemp(prefix="stylizetex_tests_")
 
     try:
         # 1. Packaging.
@@ -131,7 +131,7 @@ def main(argv: list[str] | None = None) -> int:
         # 6. Legacy install/enable.
         legacy_profile = os.path.join(workdir, "legacy_profile")
         legacy_env = isolated_env(legacy_profile)
-        legacy_env["STYLIZED_LEGACY_ZIP"] = LEGACY_ZIP
+        legacy_env["STYLIZETEX_LEGACY_ZIP"] = LEGACY_ZIP
         code, output = run(
             [blender, "--background", "--python", os.path.join(TESTS_DIR, "blender_install_test.py")],
             env=legacy_env,
@@ -167,7 +167,7 @@ def main(argv: list[str] | None = None) -> int:
                 ],
                 env=extension_env,
             )
-            extension_env["STYLIZED_EXTENSION_INSTALLED"] = "1"
+            extension_env["STYLIZETEX_EXTENSION_INSTALLED"] = "1"
         code, output = run(
             [blender, "--background", "--python", os.path.join(TESTS_DIR, "blender_extension_test.py")],
             env=extension_env,

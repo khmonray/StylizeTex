@@ -4,7 +4,7 @@ Prerequisite: the extension ZIP must already be installed into an isolated user
 repository (see ``scripts/run_tests.py``, which runs
 ``blender --command extension install-file -r user_default -e <zip>`` first).
 
-The test imports ``bl_ext.user_default.stylized_texture_addon``, verifies it
+The test imports ``bl_ext.user_default.stylizetex``, verifies it
 registers, then unregisters/registers the add-on without touching ``bl_info``.
 
 Run with::
@@ -20,7 +20,7 @@ import sys
 
 import bpy
 
-_EXTENSION_MODULE = "bl_ext.user_default.stylized_texture_addon"
+_EXTENSION_MODULE = "bl_ext.user_default.stylizetex"
 _RESULTS: list[tuple[str, bool, str]] = []
 
 
@@ -45,8 +45,8 @@ def load_extension_module():
 
 
 def main() -> int:
-    if not os.environ.get("STYLIZED_EXTENSION_INSTALLED"):
-        print("SKIP: STYLIZED_EXTENSION_INSTALLED is not set.")
+    if not os.environ.get("STYLIZETEX_EXTENSION_INSTALLED"):
+        print("SKIP: STYLIZETEX_EXTENSION_INSTALLED is not set.")
         print("RESULT: SKIP")
         return 0
 
@@ -60,23 +60,23 @@ def main() -> int:
     # bl_info may be stripped by the extension loader; registration must not care.
     print(f"note: bl_info present = {hasattr(module, 'bl_info')}")
 
-    if hasattr(bpy.types, "STYLIZED_TEXTURE_OT_process_texture"):
+    if hasattr(bpy.types, "STYLIZETEX_OT_process_texture"):
         module.unregister()
     check(
         "operator_unregistered",
-        not hasattr(bpy.types, "STYLIZED_TEXTURE_OT_process_texture"),
+        not hasattr(bpy.types, "STYLIZETEX_OT_process_texture"),
     )
 
     module.register()
     check(
         "operator_registered_without_bl_info",
-        hasattr(bpy.types, "STYLIZED_TEXTURE_OT_process_texture")
-        and hasattr(bpy.types, "STYLIZED_TEXTURE_OT_randomize_style"),
+        hasattr(bpy.types, "STYLIZETEX_OT_process_texture")
+        and hasattr(bpy.types, "STYLIZETEX_OT_randomize_style"),
     )
-    check("panel_registered", hasattr(bpy.types, "STYLIZED_PT_main"))
+    check("panel_registered", hasattr(bpy.types, "STYLIZETEX_PT_main"))
     check(
         "scene_properties_registered",
-        hasattr(bpy.types.Scene, "stylized_texture_settings"),
+        hasattr(bpy.types.Scene, "stylizetex_settings"),
     )
 
     # Leave the extension registered so Blender's own shutdown unregisters it

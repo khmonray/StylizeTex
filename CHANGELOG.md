@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0 — Immediate material application and optional embedding
+## 0.0.1 — Immediate material application and optional embedding
 
 ### Implemented
 
@@ -18,7 +18,7 @@
 
 Headless Blender coverage checks default flags, immediate application, disabled-apply behavior, source/unrelated-node preservation, repeated-run reuse, external PNG creation while packed, unsaved-blend packing, rollback on failures, and preservation of the behavior flags during randomization.
 
-## 0.2.0 — Phase 2 and Randomize Style
+### Phase 2 and Randomize Style
 
 ### Implemented
 
@@ -42,20 +42,20 @@ Headless Blender coverage checks default flags, immediate application, disabled-
 
 The repository's tested Blender target is **5.2.1**. `bl_info` and `blender_manifest.toml` declare **4.2.0** as the minimum. Versions outside the tested target are unverified.
 
-Pure tests can be run with `python -m unittest discover -s tests -p "test_*.py" -v`; the combined runner is `python scripts/run_tests.py`. Packaging uses `python scripts/package.py`. Outputs are `build/stylized_texture_addon-legacy.zip` and `build/stylized_texture_addon-extension.zip`; test-only images are under `build/artifacts/`.
+Pure tests can be run with `python -m unittest discover -s tests -p "test_*.py" -v`; the combined runner is `python scripts/run_tests.py`. Packaging uses `python scripts/package.py`. Outputs are `build/stylizetex-legacy.zip` and `build/stylizetex-extension.zip`; test-only images are under `build/artifacts/`.
 
-## 0.1.0 — Phase 1
+### Phase 1
 
 ### Implemented
 
-- Added the `Stylized Texture` View3D sidebar panel.
+- Added the `StylizeTex` View3D sidebar panel.
 - Added validation for Object Mode, an active mesh, an active UV map, an active material, an active Principled BSDF output, and a direct Image Texture link to Base Color.
 - Added the Phase 1 pipeline: color simplification, smooth low-frequency variation, contrast, and saturation.
 - Added scene-linear/sRGB conversion with untouched alpha handling.
 - Added bilinear resizing that fits the requested longest-side resolution while preserving aspect ratio.
 - Added settings defaults, range clamping, resolution normalization, deterministic seed handling, and tolerant synchronization of partial settings.
 - Added creation of a new Blender image data-block and PNG output without modifying the source image or unrelated material nodes and links.
-- Added output-folder fallback resolution and sanitized `<object>_stylized_basecolor.png` filenames.
+- Added output-folder fallback resolution and sanitized `<object>_stylizetex_basecolor.png` filenames.
 - Added a reset-settings operator.
 - Added classic legacy ZIP and Blender extension ZIP packaging.
 - Kept registration safe when Blender extension loading strips `bl_info`.

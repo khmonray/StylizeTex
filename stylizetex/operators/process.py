@@ -14,8 +14,8 @@ from ..processing.settings import adapt_settings
 from ..utils import images, materials, paths, validation
 
 
-class STYLIZED_OT_process_texture(bpy.types.Operator):
-    bl_idname = "stylized_texture.process_texture"
+class STYLIZETEX_OT_process_texture(bpy.types.Operator):
+    bl_idname = "stylizetex.process_texture"
     bl_label = "Process Texture"
     bl_description = (
         "Process the Base Color image linked to the active material into a new "
@@ -66,7 +66,7 @@ class STYLIZED_OT_process_texture(bpy.types.Operator):
             self.report({"ERROR"}, uv_error)
             return {"CANCELLED"}
 
-        group = getattr(context.scene, "stylized_texture_settings", None)
+        group = getattr(context.scene, "stylizetex_settings", None)
         settings = adapt_settings(group)
 
         apply_to_material = bool(getattr(group, "apply_to_material", True))
@@ -103,7 +103,7 @@ class STYLIZED_OT_process_texture(bpy.types.Operator):
             images.save_png(output_image, output_filepath)
         except (OSError, RuntimeError) as exc:
             bpy.data.images.remove(output_image)
-            print(f"[stylized_texture] Failed to save PNG: {exc}")
+            print(f"[stylizetex] Failed to save PNG: {exc}")
             self.report({"ERROR"}, "Unable to save texture. Check output path and permissions.")
             return {"CANCELLED"}
 
@@ -113,7 +113,7 @@ class STYLIZED_OT_process_texture(bpy.types.Operator):
                 images.pack_image(output_image)
             except (OSError, RuntimeError) as exc:
                 materials.remove_generated_image_if_unused(output_image)
-                print(f"[stylized_texture] Failed to pack image: {exc}")
+                print(f"[stylizetex] Failed to pack image: {exc}")
                 self.report(
                     {"ERROR"},
                     "Unable to pack the texture into the .blend. The material was left unchanged.",
@@ -129,7 +129,7 @@ class STYLIZED_OT_process_texture(bpy.types.Operator):
             except Exception as exc:
                 traceback.print_exc()
                 materials.remove_generated_image_if_unused(output_image)
-                print(f"[stylized_texture] Failed to apply texture: {exc}")
+                print(f"[stylizetex] Failed to apply texture: {exc}")
                 self.report(
                     {"ERROR"},
                     "Unable to apply the texture to the material. The material was left unchanged.",
@@ -145,8 +145,8 @@ class STYLIZED_OT_process_texture(bpy.types.Operator):
         materials.remove_other_generated_images(image, keep_image=output_image)
 
         status = self._build_status(output_filepath, applied, pack_output)
-        context.scene.stylized_texture_last_output = output_filepath
-        context.scene.stylized_texture_last_status = status
+        context.scene.stylizetex_last_output = output_filepath
+        context.scene.stylizetex_last_status = status
         self.report({"INFO"}, status)
         return {"FINISHED"}
 

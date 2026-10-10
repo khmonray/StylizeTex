@@ -9,9 +9,9 @@ Usage::
 
 Outputs (in ``build/`` by default):
 
-* ``stylized_texture_addon-legacy.zip`` - classic add-on layout with a
-  ``stylized_texture_addon/`` root folder and ``bl_info`` metadata.
-* ``stylized_texture_addon-extension.zip`` - Blender extension layout with
+* ``stylizetex-legacy.zip`` - classic add-on layout with a
+  ``stylizetex/`` root folder and ``bl_info`` metadata.
+* ``stylizetex-extension.zip`` - Blender extension layout with
   ``blender_manifest.toml`` at the archive root.
 
 The extension archive is produced with Blender's official ``extension build``
@@ -30,7 +30,7 @@ import zipfile
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
-PACKAGE_NAME = "stylized_texture_addon"
+PACKAGE_NAME = "stylizetex"
 PACKAGE_DIR = os.path.join(PROJECT_ROOT, PACKAGE_NAME)
 BUILD_DIR = os.path.join(PROJECT_ROOT, "build")
 

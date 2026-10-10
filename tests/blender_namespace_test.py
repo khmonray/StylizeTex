@@ -24,11 +24,11 @@ import tempfile
 import bpy
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PACKAGE_DIR = os.path.join(PROJECT_ROOT, "stylized_texture_addon")
+PACKAGE_DIR = os.path.join(PROJECT_ROOT, "stylizetex")
 
 _NAMESPACE = "bl_ext_sim"
 _REPO = "user_default"
-_PACKAGE = "stylized_texture_addon"
+_PACKAGE = "stylizetex"
 _RESULTS: list[tuple[str, bool, str]] = []
 
 
@@ -76,7 +76,7 @@ def build_namespace_copy(root: str) -> str:
 
 
 def main() -> int:
-    temp_root = tempfile.mkdtemp(prefix="stylized_ns_")
+    temp_root = tempfile.mkdtemp(prefix="stylizetex_ns_")
     build_namespace_copy(temp_root)
     sys.path.insert(0, temp_root)
 
@@ -90,15 +90,15 @@ def main() -> int:
     addon.register()
     check(
         "operator_registered",
-        hasattr(bpy.types, "STYLIZED_TEXTURE_OT_process_texture")
-        and hasattr(bpy.types, "STYLIZED_TEXTURE_OT_randomize_style"),
+        hasattr(bpy.types, "STYLIZETEX_OT_process_texture")
+        and hasattr(bpy.types, "STYLIZETEX_OT_randomize_style"),
     )
-    check("panel_registered", hasattr(bpy.types, "STYLIZED_PT_main"))
+    check("panel_registered", hasattr(bpy.types, "STYLIZETEX_PT_main"))
     addon.unregister()
     check(
         "operator_unregistered",
-        not hasattr(bpy.types, "STYLIZED_TEXTURE_OT_process_texture")
-        and not hasattr(bpy.types, "STYLIZED_TEXTURE_OT_randomize_style"),
+        not hasattr(bpy.types, "STYLIZETEX_OT_process_texture")
+        and not hasattr(bpy.types, "STYLIZETEX_OT_randomize_style"),
     )
 
     failures = [name for name, ok, _ in _RESULTS if not ok]

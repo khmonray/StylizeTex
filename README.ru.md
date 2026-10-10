@@ -1,4 +1,4 @@
-# Stylized Texture Processor
+# StylizeTex
 
 Дополнение Blender читает изображение Base Color активного материала активного UV-развёрнутого меша, обрабатывает его, сохраняет новый PNG и по умолчанию подключает созданное изображение к материалу. Исходное изображение, исходный узел, а также не связанные с ним узлы и связи материала сохраняются. Эта документация описывает реализацию, существующую в репозитории; конкретное визуальное качество не гарантируется.
 
@@ -48,15 +48,15 @@ Phase 2 добавляет `Hue Variation`, `Brush Scale`, `Paint Variation` и 
 
 ### Legacy add-on ZIP
 
-Используйте `build/stylized_texture_addon-legacy.zip`. Архив содержит корневую папку `stylized_texture_addon/` и литеральные метаданные `bl_info`, используемые классической системой add-on Blender.
+Используйте `build/stylizetex-legacy.zip`. Архив содержит корневую папку `stylizetex/` и литеральные метаданные `bl_info`, используемые классической системой add-on Blender.
 
 1. В Blender откройте **Edit > Preferences > Add-ons**.
-2. Нажмите **Install...** и выберите `stylized_texture_addon-legacy.zip`.
-3. Включите **Stylized Texture Processor**.
+2. Нажмите **Install...** и выберите `stylizetex-legacy.zip`.
+3. Включите **StylizeTex**.
 
 ### Blender extension ZIP
 
-Используйте `build/stylized_texture_addon-extension.zip`. В корне этого архива находится `blender_manifest.toml`; архив предназначен для workflow extensions Blender.
+Используйте `build/stylizetex-extension.zip`. В корне этого архива находится `blender_manifest.toml`; архив предназначен для workflow extensions Blender.
 
 Установите его через интерфейс Blender **Preferences > Get Extensions**, используя установку с диска, либо примените команды extension, соответствующие установленной версии Blender. Не устанавливайте extension-архив как классический add-on, если Blender ожидает пакет extension.
 
@@ -64,7 +64,7 @@ Phase 2 добавляет `Hue Variation`, `Brush Scale`, `Paint Variation` и 
 
 ## Интерфейс и использование
 
-После включения дополнения откройте боковую панель 3D Viewport клавишей `N` и выберите вкладку **Stylized Texture**. Панель зарегистрирована в `View3D > Sidebar > Stylized Texture`.
+После включения дополнения откройте боковую панель 3D Viewport клавишей `N` и выберите вкладку **StylizeTex**. Панель зарегистрирована в `View3D > Sidebar > StylizeTex`.
 
 Панель сгруппирована следующим образом:
 
@@ -106,7 +106,7 @@ Phase 2 добавляет `Hue Variation`, `Brush Scale`, `Paint Variation` и 
 
 ## Поведение вывода
 
-Результат — новое изображение и внешний PNG. Имя по умолчанию: `<object>_stylized_basecolor.png`; имена объектов очищаются для использования в файловой системе. Явный путь файла оператора имеет приоритет над настройкой папки вывода.
+Результат — новое изображение и внешний PNG. Имя по умолчанию: `<object>_stylizetex_basecolor.png`; имена объектов очищаются для использования в файловой системе. Явный путь файла оператора имеет приоритет над настройкой папки вывода.
 
 Если **Output Folder** пуст, дополнение последовательно использует папку исходного изображения, папку файла `.blend`, а затем временную папку Blender. Последний fallback используется для несохранённого blend, если пригодной папки исходного изображения нет. Существующий файл может быть перезаписан при совпадении вычисленного имени; уникальный суффикс к имени на диске не добавляется. Некорректный, недоступный или недоступный для записи путь отменяет обработку и вызывает ошибку. При каждом запуске создаётся новый блок данных изображения; при включённом применении он заменяет предыдущий созданный результат в материале, а исходное изображение и несвязанные данные материала сохраняются.
 
@@ -186,7 +186,7 @@ Save the .blend manually if the packed data or material link must persist
 ## Архитектура
 
 ```text
-stylized_texture_addon/
+stylizetex/
 ├── __init__.py                 registration, legacy metadata, safe extension loading
 ├── operators/
 │   ├── process.py              validation, resize, pipeline, image creation, PNG save
@@ -246,7 +246,7 @@ python -m unittest discover -s tests -p "test_*.py" -v
 
 Чистые тесты покрывают регрессию Phase 1, HSV/hue Phase 2, обработку micro-detail и painterly, детерминированные seed, адаптацию настроек и выбор параметров Randomize Style. В Blender-тестах есть набор `blender-materials` для проверки применения материала, упаковки и отката, а также циклов регистрации, обработки, неизменности исходных данных/материала, сохранения настроек и отсутствия обработки у Randomize Style, загрузки без metadata, legacy-установки, установки/валидации extension и синтетических A/B/C-артефактов.
 
-Создаваемые артефакты упаковки: `build/stylized_texture_addon-legacy.zip` и `build/stylized_texture_addon-extension.zip`. Тестовые визуальные артефакты: `build/artifacts/A_original.png`, `build/artifacts/B_stylized.png` и `build/artifacts/C_material_view.png`.
+Создаваемые артефакты упаковки: `build/stylizetex-legacy.zip` и `build/stylizetex-extension.zip`. Тестовые визуальные артефакты: `build/artifacts/A_original.png`, `build/artifacts/B_stylized.png` и `build/artifacts/C_material_view.png`.
 
 Фактическая совместимость с конкретной версией Blender требует запуска этих тестов с соответствующим исполняемым файлом; тестовой целью репозитория является Blender 5.2.1.
 

@@ -12,8 +12,8 @@ import bpy
 from ..processing.randomize import STYLE_FIELDS, pick_new_seed, randomized_style
 
 
-class STYLIZED_OT_randomize_style(bpy.types.Operator):
-    bl_idname = "stylized_texture.randomize_style"
+class STYLIZETEX_OT_randomize_style(bpy.types.Operator):
+    bl_idname = "stylizetex.randomize_style"
     bl_label = "Randomize Style"
     bl_description = (
         "Pick a new seed and sample restrained style settings. Output resolution, "
@@ -22,7 +22,7 @@ class STYLIZED_OT_randomize_style(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        group = getattr(context.scene, "stylized_texture_settings", None)
+        group = getattr(context.scene, "stylizetex_settings", None)
         if group is None:
             self.report({"ERROR"}, "Stylization settings are unavailable.")
             return {"CANCELLED"}

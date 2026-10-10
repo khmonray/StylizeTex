@@ -17,7 +17,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from stylized_texture_addon.processing import (  # noqa: E402
+from stylizetex.processing import (  # noqa: E402
     StylizationSettings,
     fit_resolution,
     linear_to_srgb,

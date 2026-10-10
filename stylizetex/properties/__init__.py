@@ -3,7 +3,7 @@
 from .settings import (
     DEFAULTS,
     RESOLUTION_ITEMS,
-    StylizedTextureSettings,
+    StylizeTexSettings,
     classes,
     register_scene_properties,
     reset_settings,
@@ -13,7 +13,7 @@ from .settings import (
 __all__ = [
     "DEFAULTS",
     "RESOLUTION_ITEMS",
-    "StylizedTextureSettings",
+    "StylizeTexSettings",
     "classes",
     "register_scene_properties",
     "reset_settings",

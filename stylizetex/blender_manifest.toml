@@ -2,9 +2,9 @@
 # See: https://docs.blender.org/manual/en/latest/extensions/index.html
 schema_version = "1.0.0"
 
-id = "stylized_texture_addon"
-version = "0.3.0"
-name = "Stylized Texture Processor"
+id = "stylizetex"
+version = "0.0.1"
+name = "StylizeTex"
 tagline = "Turn Base Color textures into a stylized, hand-painted look"
 maintainer = "github.com/khmonray"
 type = "add-on"

@@ -94,4 +94,4 @@ def pack_image(image) -> None:
 
 
 def new_image_name(object_name: str) -> str:
-    return f"{object_name}_stylized_basecolor"
+    return f"{object_name}_stylizetex_basecolor"

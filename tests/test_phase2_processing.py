@@ -12,7 +12,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from stylized_texture_addon.processing import (  # noqa: E402
+from stylizetex.processing import (  # noqa: E402
     StylizationSettings,
     adapt_settings,
     apply_hue_variation,
@@ -263,7 +263,7 @@ class SeedingTests(unittest.TestCase):
     def test_old_variation_stream_is_untouched(self):
         # ``variation.low_frequency_field`` still uses ``default_rng(seed)``
         # directly; the Phase 2 helper must not share that stream.
-        from stylized_texture_addon.processing import low_frequency_field
+        from stylizetex.processing import low_frequency_field
 
         legacy_a = low_frequency_field(16, 16, 0.25, seed=3)
         legacy_b = low_frequency_field(16, 16, 0.25, seed=3)

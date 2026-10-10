@@ -7,16 +7,16 @@ import bpy
 from ..utils.validation import get_base_color_source_image
 
 
-class STYLIZED_PT_main(bpy.types.Panel):
-    bl_label = "Stylized Texture"
-    bl_idname = "STYLIZED_PT_main"
+class STYLIZETEX_PT_main(bpy.types.Panel):
+    bl_label = "StylizeTex"
+    bl_idname = "STYLIZETEX_PT_main"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "Stylized Texture"
+    bl_category = "StylizeTex"
 
     def draw(self, context):
         layout = self.layout
-        group = getattr(context.scene, "stylized_texture_settings", None)
+        group = getattr(context.scene, "stylizetex_settings", None)
 
         if group is None:
             layout.label(text="Settings unavailable.", icon="ERROR")
@@ -66,19 +66,19 @@ class STYLIZED_PT_main(bpy.types.Panel):
         seed_group.prop(group, "seed")
 
         layout.separator()
-        layout.operator("stylized_texture.process_texture", icon="SHADERFX")
-        layout.operator("stylized_texture.randomize_style", icon="FILE_REFRESH")
-        layout.operator("stylized_texture.reset_settings", icon="LOOP_BACK")
+        layout.operator("stylizetex.process_texture", icon="SHADERFX")
+        layout.operator("stylizetex.randomize_style", icon="FILE_REFRESH")
+        layout.operator("stylizetex.reset_settings", icon="LOOP_BACK")
 
-        last_output = getattr(context.scene, "stylized_texture_last_output", "")
+        last_output = getattr(context.scene, "stylizetex_last_output", "")
         if last_output:
             layout.label(text="Last: " + last_output, icon="CHECKMARK")
 
-        last_status = getattr(context.scene, "stylized_texture_last_status", "")
+        last_status = getattr(context.scene, "stylizetex_last_status", "")
         if last_status:
             layout.label(text=last_status, icon="INFO")
 
 
-classes = (STYLIZED_PT_main,)
+classes = (STYLIZETEX_PT_main,)
 
-__all__ = ["STYLIZED_PT_main", "classes"]
+__all__ = ["STYLIZETEX_PT_main", "classes"]

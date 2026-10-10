@@ -1,4 +1,4 @@
-# Blender add-on: Stylized Texture Processor
+# Blender add-on: StylizeTex
 #
 # ``bl_info`` is declared as a literal at the very start of this file, before any
 # dependent imports, so the legacy add-on system can discover the package
@@ -7,11 +7,11 @@
 # registration, UI and operators must NEVER depend on ``bl_info`` existing.
 
 bl_info = {
-    "name": "Stylized Texture Processor",
+    "name": "StylizeTex",
     "author": "github.com/khmonray",
-    "version": (0, 3, 0),
+    "version": (0, 0, 1),
     "blender": (4, 2, 0),
-    "location": "View3D > Sidebar > Stylized Texture",
+    "location": "View3D > Sidebar > StylizeTex",
     "description": "Non-destructively turn a Base Color texture into a stylized version.",
     "category": "Object",
 }

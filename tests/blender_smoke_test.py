@@ -1,4 +1,4 @@
-"""Headless Blender smoke test: register/unregister + operator + non-mutation.
+﻿"""Headless Blender smoke test: register/unregister + operator + non-mutation.
 
 Run with::
 
@@ -42,7 +42,7 @@ def call_expect_cancelled(*args, **kwargs) -> set:
     """Blender raises RuntimeError for operator ERROR reports; treat as cancel."""
 
     try:
-        return bpy.ops.stylized_texture.process_texture(*args, **kwargs)
+        return bpy.ops.stylizetex.process_texture(*args, **kwargs)
     except RuntimeError:
         return {"CANCELLED"}
 
@@ -73,38 +73,38 @@ def make_material(name: str, image):
 
 
 def test_register_cycle():
-    import stylized_texture_addon as addon
+    import stylizetex as addon
 
     addon.register()
     check(
         "operator_registered",
-        is_operator_registered("stylized_texture.process_texture")
-        and is_operator_registered("stylized_texture.reset_settings")
-        and is_operator_registered("stylized_texture.randomize_style"),
+        is_operator_registered("stylizetex.process_texture")
+        and is_operator_registered("stylizetex.reset_settings")
+        and is_operator_registered("stylizetex.randomize_style"),
     )
-    check("panel_registered", hasattr(bpy.types, "STYLIZED_PT_main"))
-    check("scene_settings_registered", hasattr(bpy.types.Scene, "stylized_texture_settings"))
+    check("panel_registered", hasattr(bpy.types, "STYLIZETEX_PT_main"))
+    check("scene_settings_registered", hasattr(bpy.types.Scene, "stylizetex_settings"))
     addon.unregister()
     check(
         "operator_unregistered",
-        not is_operator_registered("stylized_texture.process_texture")
-        and not is_operator_registered("stylized_texture.randomize_style"),
+        not is_operator_registered("stylizetex.process_texture")
+        and not is_operator_registered("stylizetex.randomize_style"),
     )
-    check("panel_unregistered", not hasattr(bpy.types, "STYLIZED_PT_main"))
+    check("panel_unregistered", not hasattr(bpy.types, "STYLIZETEX_PT_main"))
     check(
         "scene_settings_unregistered",
-        not hasattr(bpy.types.Scene, "stylized_texture_settings"),
+        not hasattr(bpy.types.Scene, "stylizetex_settings"),
     )
     # Register again for the operator tests.
     addon.register()
 
 
 def test_metadata():
-    import stylized_texture_addon as addon
+    import stylizetex as addon
 
     info = getattr(addon, "bl_info", {})
-    check("bl_info_version_030", info.get("version") == (0, 3, 0), str(info.get("version")))
-    group = bpy.context.scene.stylized_texture_settings
+    check("bl_info_version_001", info.get("version") == (0, 0, 1), str(info.get("version")))
+    group = bpy.context.scene.stylizetex_settings
     for name in ("hue_variation", "brush_scale", "paint_variation", "micro_detail"):
         check(f"property_{name}", hasattr(group, name))
     check("property_apply_to_material", group.apply_to_material is True, str(group.apply_to_material))
@@ -118,7 +118,7 @@ def test_operator_undo_options():
     ``bl_options`` must contain both ``REGISTER`` and ``UNDO``.
     """
 
-    operator = bpy.types.STYLIZED_TEXTURE_OT_process_texture
+    operator = bpy.types.STYLIZETEX_OT_process_texture
     options = set(operator.bl_options)
     check("process_operator_register_option", "REGISTER" in options, str(options))
     check("process_operator_undo_option", "UNDO" in options, str(options))
@@ -133,7 +133,7 @@ def build_scene():
     material = make_material("SmokeMaterial", image)
     obj.data.materials.append(material)
 
-    settings = bpy.context.scene.stylized_texture_settings
+    settings = bpy.context.scene.stylizetex_settings
     settings.output_resolution = "512"
     settings.color_steps = 6
     settings.seed = 4242
@@ -142,7 +142,7 @@ def build_scene():
 
 
 def test_operator_success():
-    from stylized_texture_addon.utils import materials
+    from stylizetex.utils import materials
 
     obj, image, material = build_scene()
     node_tree = material.node_tree
@@ -153,10 +153,10 @@ def test_operator_success():
 
     check("mesh_has_uv", obj.data.uv_layers.active is not None)
 
-    output_dir = tempfile.mkdtemp(prefix="stylized_smoke_")
+    output_dir = tempfile.mkdtemp(prefix="stylizetex_smoke_")
     output_png = os.path.join(output_dir, "smoke_output.png")
 
-    result = bpy.ops.stylized_texture.process_texture(filepath=output_png)
+    result = bpy.ops.stylizetex.process_texture(filepath=output_png)
     check("operator_finished", result == {"FINISHED"}, str(result))
 
     # Source image is never modified.
@@ -194,7 +194,7 @@ def test_operator_success():
     created = [
         candidate
         for candidate in bpy.data.images
-        if candidate.name.startswith("SmokeObject_stylized_basecolor")
+        if candidate.name.startswith("SmokeObject_stylizetex_basecolor")
     ]
     check("new_image_created", len(created) >= 1)
 
@@ -219,7 +219,7 @@ def test_operator_success():
 
 
 def test_reset_operator():
-    settings = bpy.context.scene.stylized_texture_settings
+    settings = bpy.context.scene.stylizetex_settings
     settings.color_steps = 3
     settings.contrast = 1.9
     settings.hue_variation = 0.4
@@ -228,7 +228,7 @@ def test_reset_operator():
     settings.brush_scale = 0.6
     settings.apply_to_material = False
     settings.pack_output = True
-    result = bpy.ops.stylized_texture.reset_settings()
+    result = bpy.ops.stylizetex.reset_settings()
     check("reset_finished", result == {"FINISHED"}, str(result))
     check("reset_color_steps", settings.color_steps == 8, str(settings.color_steps))
     check("reset_contrast", abs(settings.contrast - 1.05) < 1e-5, str(settings.contrast))
@@ -246,18 +246,18 @@ def test_randomize_operator():
     bpy.ops.object.select_all(action="DESELECT")
     bpy.context.view_layer.objects.active = None
 
-    settings = bpy.context.scene.stylized_texture_settings
+    settings = bpy.context.scene.stylizetex_settings
     settings.output_resolution = "1024"
     settings.output_dir = "C:/somewhere"
     settings.apply_to_material = False
     settings.pack_output = True
-    bpy.context.scene.stylized_texture_last_output = "C:/somewhere/keep.png"
+    bpy.context.scene.stylizetex_last_output = "C:/somewhere/keep.png"
 
     images_before = len(bpy.data.images)
     materials_before = len(bpy.data.materials)
 
     seed_before = settings.seed
-    result = bpy.ops.stylized_texture.randomize_style()
+    result = bpy.ops.stylizetex.randomize_style()
     check("randomize_finished", result == {"FINISHED"}, str(result))
     seed_after = settings.seed
     check("randomize_seed_changed", seed_after != seed_before, f"{seed_before} -> {seed_after}")
@@ -269,7 +269,7 @@ def test_randomize_operator():
     check("randomize_keeps_pack_output", settings.pack_output is True)
     check(
         "randomize_keeps_last_output",
-        bpy.context.scene.stylized_texture_last_output == "C:/somewhere/keep.png",
+        bpy.context.scene.stylizetex_last_output == "C:/somewhere/keep.png",
     )
 
     # No data-blocks were created and no files touched.
@@ -296,7 +296,7 @@ def test_randomize_operator():
         settings.brush_scale,
         settings.seed,
     )
-    bpy.ops.stylized_texture.randomize_style()
+    bpy.ops.stylizetex.randomize_style()
     second_style = (
         settings.color_steps,
         settings.color_simplification,
@@ -371,7 +371,7 @@ def main() -> int:
     test_randomize_operator()
     test_error_paths()
 
-    import stylized_texture_addon as addon
+    import stylizetex as addon
 
     addon.unregister()
 
@@ -385,3 +385,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+

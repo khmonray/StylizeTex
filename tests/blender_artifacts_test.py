@@ -27,15 +27,15 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from stylized_texture_addon.processing import (  # noqa: E402
+from stylizetex.processing import (  # noqa: E402
     StylizationSettings,
     linear_to_srgb,
     multiscale_field,
     process_texture,
     srgb_to_linear,
 )
-from stylized_texture_addon.processing.seeding import effect_rng  # noqa: E402
-from stylized_texture_addon.utils import images  # noqa: E402
+from stylizetex.processing.seeding import effect_rng  # noqa: E402
+from stylizetex.utils import images  # noqa: E402
 
 ARTIFACT_DIR = os.path.join(PROJECT_ROOT, "build", "artifacts")
 SIZE = 512
@@ -123,7 +123,7 @@ def save_artifact(name: str, srgb_rgb: np.ndarray) -> str:
     return path
 
 
-def build_material_view(stylized_image, output_path: str) -> None:
+def build_material_view(stylizetex_image, output_path: str) -> None:
     scene = bpy.context.scene
     bpy.ops.mesh.primitive_plane_add(size=2.0)
     plane = bpy.context.active_object
@@ -134,7 +134,7 @@ def build_material_view(stylized_image, output_path: str) -> None:
     node_tree = material.node_tree
     bsdf = node_tree.nodes.get("Principled BSDF")
     texture = node_tree.nodes.new("ShaderNodeTexImage")
-    texture.image = stylized_image
+    texture.image = stylizetex_image
     node_tree.links.new(texture.outputs["Color"], bsdf.inputs["Base Color"])
     bsdf.inputs["Roughness"].default_value = 0.8
     plane.data.materials.append(material)
@@ -200,16 +200,16 @@ def main() -> int:
     linear_phase1 = process_texture(linear_original, phase1_settings, is_linear=True)
     linear_stylized = process_texture(linear_original, settings, is_linear=True)
     phase1_srgb = linear_to_srgb(linear_phase1[..., :3])
-    stylized_srgb = linear_to_srgb(linear_stylized[..., :3])
-    path_b = save_artifact("B_stylized", stylized_srgb)
+    stylizetex_srgb = linear_to_srgb(linear_stylized[..., :3])
+    path_b = save_artifact("B_stylized", stylizetex_srgb)
     check("artifact_B_written", os.path.isfile(path_b) and os.path.getsize(path_b) > 0, path_b)
 
     # Visual-behaviour checks.
-    check("stylized_differs_from_original", not np.array_equal(stylized_srgb, original))
-    check("stylized_differs_from_phase1", not np.array_equal(stylized_srgb, phase1_srgb))
+    check("stylizetex_differs_from_original", not np.array_equal(stylizetex_srgb, original))
+    check("stylizetex_differs_from_phase1", not np.array_equal(stylizetex_srgb, phase1_srgb))
     hf_original = high_frequency_energy(original)
     hf_phase1 = high_frequency_energy(phase1_srgb)
-    hf_stylized = high_frequency_energy(stylized_srgb)
+    hf_stylized = high_frequency_energy(stylizetex_srgb)
     # The Phase 2 effects must not add high-frequency grain relative to the
     # Phase 1 look they are applied on top of.
     check(
@@ -229,7 +229,7 @@ def main() -> int:
     )
 
     # C: material view render (best effort in headless mode).
-    stylized_linear_image = images.create_image_from_linear_rgba(
+    stylizetex_linear_image = images.create_image_from_linear_rgba(
         "Phase2StylizedLinear", np.concatenate(
             [linear_stylized[..., :3],
              np.ones((*linear_stylized.shape[:2], 1), dtype=np.float32)],
@@ -238,7 +238,7 @@ def main() -> int:
     )
     path_c = os.path.join(ARTIFACT_DIR, "C_material_view.png")
     try:
-        build_material_view(stylized_linear_image, path_c)
+        build_material_view(stylizetex_linear_image, path_c)
         check("artifact_C_rendered", os.path.isfile(path_c) and os.path.getsize(path_c) > 0, path_c)
     except Exception as exc:  # pragma: no cover - depends on render backend
         print(f"NOTE: material-view render unavailable: {exc}")

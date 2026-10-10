@@ -1,4 +1,4 @@
-# Stylized Texture Processor
+# StylizeTex
 
 Blender add-on that reads the Base Color image from the active material of the active UV-mapped mesh, processes it, saves a new PNG, and by default connects the generated image to the material. The source image, source node, and unrelated material nodes and links are preserved. This documentation describes the implementation that exists in this repository; it does not promise a particular visual quality.
 
@@ -48,15 +48,15 @@ Not implemented: Phase 3 material features (roughness, AO, curvature, and materi
 
 ### Legacy add-on ZIP
 
-Use `build/stylized_texture_addon-legacy.zip`. This archive contains a top-level `stylized_texture_addon/` folder and the literal `bl_info` metadata used by Blender's classic add-on system.
+Use `build/stylizetex-legacy.zip`. This archive contains a top-level `stylizetex/` folder and the literal `bl_info` metadata used by Blender's classic add-on system.
 
 1. In Blender, open **Edit > Preferences > Add-ons**.
-2. Choose **Install...** and select `stylized_texture_addon-legacy.zip`.
-3. Enable **Stylized Texture Processor**.
+2. Choose **Install...** and select `stylizetex-legacy.zip`.
+3. Enable **StylizeTex**.
 
 ### Blender extension ZIP
 
-Use `build/stylized_texture_addon-extension.zip`. This archive has `blender_manifest.toml` at its root and is intended for Blender's extension workflow.
+Use `build/stylizetex-extension.zip`. This archive has `blender_manifest.toml` at its root and is intended for Blender's extension workflow.
 
 Install it through Blender's **Preferences > Get Extensions** interface using the install-from-disk option, or use the extension commands appropriate to the installed Blender version. Do not install the extension archive as a classic add-on if Blender expects an extension package.
 
@@ -64,7 +64,7 @@ The packaging script uses Blender's `extension build` command when a Blender exe
 
 ## User interface and usage
 
-After enabling the add-on, open the 3D Viewport sidebar with `N` and select the **Stylized Texture** tab. The panel is registered in `View3D > Sidebar > Stylized Texture`.
+After enabling the add-on, open the 3D Viewport sidebar with `N` and select the **StylizeTex** tab. The panel is registered in `View3D > Sidebar > StylizeTex`.
 
 The panel is grouped as follows:
 
@@ -106,7 +106,7 @@ Enable **Pack into .blend** to pack the generated image in addition to writing t
 
 ## Output behavior
 
-The output is a new image and an external PNG. The default filename is `<object>_stylized_basecolor.png`; object names are sanitized for filesystem use. An explicit operator file path overrides the output-folder setting.
+The output is a new image and an external PNG. The default filename is `<object>_stylizetex_basecolor.png`; object names are sanitized for filesystem use. An explicit operator file path overrides the output-folder setting.
 
 If **Output Folder** is empty, the add-on falls back in order to the source image folder, the `.blend` file folder, and Blender's temporary directory. This last fallback is used for an unsaved blend when no usable source-image folder exists. Existing files may be overwritten when the resolved filename is the same; the implementation does not add a unique suffix to disk filenames. An invalid, inaccessible, or unwritable output path cancels processing and reports an error. Each processing run creates a new image data-block; with apply enabled it replaces the previous generated result in the material, while the input source image and unrelated material data remain preserved.
 
@@ -186,7 +186,7 @@ The planned workflow in `document.txt` mentions material generation, AO, roughne
 ## Architecture
 
 ```text
-stylized_texture_addon/
+stylizetex/
 ├── __init__.py                 registration, legacy metadata, safe extension loading
 ├── operators/
 │   ├── process.py              validation, resize, pipeline, image creation, PNG save
@@ -246,7 +246,7 @@ python -m unittest discover -s tests -p "test_*.py" -v
 
 The pure tests cover Phase 1 regression, Phase 2 HSV/hue, micro-detail and painterly processing, deterministic seeding, settings adaptation, and Randomize Style sampling. Blender tests include the `blender-materials` suite for material application, packing, and rollback, as well as registration cycles, processing, non-mutation of source/material data, Randomize Style preservation and no-processing behavior, metadata-stripped loading, legacy installation, extension installation/validation, and synthetic A/B/C artifacts.
 
-The generated packaging artifacts are `build/stylized_texture_addon-legacy.zip` and `build/stylized_texture_addon-extension.zip`. The test-only visual artifacts are `build/artifacts/A_original.png`, `build/artifacts/B_stylized.png`, and `build/artifacts/C_material_view.png`.
+The generated packaging artifacts are `build/stylizetex-legacy.zip` and `build/stylizetex-extension.zip`. The test-only visual artifacts are `build/artifacts/A_original.png`, `build/artifacts/B_stylized.png`, and `build/artifacts/C_material_view.png`.
 
 Actual Blender-version compatibility remains subject to running these tests with that Blender executable; the repository test target is Blender 5.2.1.
 

@@ -17,7 +17,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from stylized_texture_addon.processing import StylizationSettings, process_texture  # noqa: E402
+from stylizetex.processing import StylizationSettings, process_texture  # noqa: E402
 
 FIXTURE = os.path.join(PROJECT_ROOT, "tests", "fixtures", "phase1_reference.npz")
 

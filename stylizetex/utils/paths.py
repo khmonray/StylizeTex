@@ -16,7 +16,7 @@ def sanitize_name(name: str, fallback: str = "object") -> str:
 
 
 def build_output_filename(object_name: str) -> str:
-    return f"{sanitize_name(object_name)}_stylized_basecolor.png"
+    return f"{sanitize_name(object_name)}_stylizetex_basecolor.png"
 
 
 def resolve_output_dir(context, image, output_dir: str) -> str:

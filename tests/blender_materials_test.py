@@ -1,7 +1,7 @@
 """Headless Blender tests: material application, packing and rollback.
 
 Covers the apply-to-material and pack-into-.blend behavior of
-``stylized_texture.process_texture``:
+``stylizetex.process_texture``:
 
 * ``Apply to Material`` defaults to ``True`` and retargets only the Base Color
   link while keeping the original source node and image intact;
@@ -31,9 +31,9 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from stylized_texture_addon.utils import images as images_mod  # noqa: E402
-from stylized_texture_addon.utils import materials as materials_mod  # noqa: E402
-from stylized_texture_addon.utils import validation  # noqa: E402
+from stylizetex.utils import images as images_mod  # noqa: E402
+from stylizetex.utils import materials as materials_mod  # noqa: E402
+from stylizetex.utils import validation  # noqa: E402
 
 _RESULTS: list[tuple[str, bool, str]] = []
 
@@ -46,7 +46,7 @@ def check(name: str, condition: bool, detail: str = "") -> None:
 def reset_output_flags(*, apply_to_material: bool = True, pack_output: bool = False) -> None:
     """Reset the two output flags so tests never leak state into each other."""
 
-    settings = bpy.context.scene.stylized_texture_settings
+    settings = bpy.context.scene.stylizetex_settings
     settings.apply_to_material = apply_to_material
     settings.pack_output = pack_output
 
@@ -55,7 +55,7 @@ def call_expect_cancelled(*args, **kwargs) -> set:
     """Blender raises ``RuntimeError`` for operator ERROR reports."""
 
     try:
-        return bpy.ops.stylized_texture.process_texture(*args, **kwargs)
+        return bpy.ops.stylizetex.process_texture(*args, **kwargs)
     except RuntimeError:
         return {"CANCELLED"}
 
@@ -146,7 +146,7 @@ def build_scene(name: str, with_extra_nodes: bool = False):
         node_tree.links.new(extra_tex.outputs["Color"], bsdf.inputs["Roughness"])
         node_tree.nodes.new("ShaderNodeRGB").name = f"{name}UnrelatedNode"
 
-    settings = bpy.context.scene.stylized_texture_settings
+    settings = bpy.context.scene.stylizetex_settings
     settings.output_resolution = "512"
     return obj, image, material
 
@@ -160,7 +160,7 @@ def test_apply_default_enabled():
     reset_datablocks()
     reset_output_flags(apply_to_material=True, pack_output=False)
     obj, image, material = build_scene("ApplyDefault")
-    settings = bpy.context.scene.stylized_texture_settings
+    settings = bpy.context.scene.stylizetex_settings
     check("apply_default_true", settings.apply_to_material is True, str(settings.apply_to_material))
 
     node_tree = material.node_tree
@@ -168,8 +168,8 @@ def test_apply_default_enabled():
     source_node_name = source_node.name
     source_pixels_before = np.array(image.pixels[:], dtype=np.float32)
 
-    output_png = process_to_temp(obj, "stylized_materials_default_")
-    result = bpy.ops.stylized_texture.process_texture(filepath=output_png)
+    output_png = process_to_temp(obj, "stylizetex_materials_default_")
+    result = bpy.ops.stylizetex.process_texture(filepath=output_png)
     check("apply_default_finished", result == {"FINISHED"}, str(result))
 
     new_source = base_color_link(material)
@@ -199,15 +199,15 @@ def test_apply_disabled():
     reset_datablocks()
     reset_output_flags(apply_to_material=False, pack_output=False)
     obj, image, material = build_scene("ApplyDisabled")
-    settings = bpy.context.scene.stylized_texture_settings
+    settings = bpy.context.scene.stylizetex_settings
     settings.apply_to_material = False
 
     node_tree = material.node_tree
     source_node_name = base_color_link(material).name
     source_pixels_before = np.array(image.pixels[:], dtype=np.float32)
 
-    output_png = process_to_temp(obj, "stylized_materials_disabled_")
-    result = bpy.ops.stylized_texture.process_texture(filepath=output_png)
+    output_png = process_to_temp(obj, "stylizetex_materials_disabled_")
+    result = bpy.ops.stylizetex.process_texture(filepath=output_png)
     check("apply_disabled_finished", result == {"FINISHED"}, str(result))
 
     check("apply_disabled_link_unchanged", base_color_link(material).name == source_node_name)
@@ -226,8 +226,8 @@ def test_apply_disabled():
     # the previous unused generated image is cleaned up and only the latest
     # output is kept.
     for _ in range(3):
-        repeated_png = process_to_temp(obj, "stylized_materials_disabled_repeat_")
-        repeated = bpy.ops.stylized_texture.process_texture(filepath=repeated_png)
+        repeated_png = process_to_temp(obj, "stylizetex_materials_disabled_repeat_")
+        repeated = bpy.ops.stylizetex.process_texture(filepath=repeated_png)
         check("apply_disabled_repeat_finished", repeated == {"FINISHED"}, str(repeated))
     check("apply_disabled_no_accumulation", marked_image_count() == 1, str(marked_image_count()))
     check(
@@ -241,19 +241,19 @@ def test_repeated_runs_single_generated_node():
     reset_datablocks()
     reset_output_flags(apply_to_material=True, pack_output=False)
     obj, image, material = build_scene("Repeat")
-    settings = bpy.context.scene.stylized_texture_settings
+    settings = bpy.context.scene.stylizetex_settings
     settings.apply_to_material = True
 
     node_tree = material.node_tree
     source_node_name = base_color_link(material).name
 
-    first_png = os.path.join(tempfile.mkdtemp(prefix="stylized_materials_repeat_"), "output.png")
-    result1 = bpy.ops.stylized_texture.process_texture(filepath=first_png)
+    first_png = os.path.join(tempfile.mkdtemp(prefix="stylizetex_materials_repeat_"), "output.png")
+    result1 = bpy.ops.stylizetex.process_texture(filepath=first_png)
     check("repeat_first_finished", result1 == {"FINISHED"}, str(result1))
     first_generated_name = base_color_link(material).name
 
-    second_png = os.path.join(tempfile.mkdtemp(prefix="stylized_materials_repeat_"), "output.png")
-    result2 = bpy.ops.stylized_texture.process_texture(filepath=second_png)
+    second_png = os.path.join(tempfile.mkdtemp(prefix="stylizetex_materials_repeat_"), "output.png")
+    result2 = bpy.ops.stylizetex.process_texture(filepath=second_png)
     check("repeat_second_finished", result2 == {"FINISHED"}, str(result2))
     second_generated_name = base_color_link(material).name
 
@@ -268,7 +268,7 @@ def test_source_and_unrelated_preserved():
     reset_datablocks()
     reset_output_flags(apply_to_material=True, pack_output=False)
     obj, image, material = build_scene("Preserve", with_extra_nodes=True)
-    settings = bpy.context.scene.stylized_texture_settings
+    settings = bpy.context.scene.stylizetex_settings
     settings.apply_to_material = True
 
     node_tree = material.node_tree
@@ -279,8 +279,8 @@ def test_source_and_unrelated_preserved():
     extra_node = node_tree.nodes.get("PreserveExtraRoughnessNode")
     extra_pixels_before = np.array(extra_node.image.pixels[:], dtype=np.float32)
 
-    output_png = process_to_temp(obj, "stylized_materials_preserve_")
-    result = bpy.ops.stylized_texture.process_texture(filepath=output_png)
+    output_png = process_to_temp(obj, "stylizetex_materials_preserve_")
+    result = bpy.ops.stylizetex.process_texture(filepath=output_png)
     check("preserve_finished", result == {"FINISHED"}, str(result))
 
     nodes_after = {node.name for node in node_tree.nodes}
@@ -314,12 +314,12 @@ def test_pack_and_external_png():
     reset_datablocks()
     reset_output_flags(apply_to_material=True, pack_output=True)
     obj, image, material = build_scene("Pack")
-    settings = bpy.context.scene.stylized_texture_settings
+    settings = bpy.context.scene.stylizetex_settings
     settings.apply_to_material = True
     settings.pack_output = True
 
-    output_png = process_to_temp(obj, "stylized_materials_pack_")
-    result = bpy.ops.stylized_texture.process_texture(filepath=output_png)
+    output_png = process_to_temp(obj, "stylizetex_materials_pack_")
+    result = bpy.ops.stylizetex.process_texture(filepath=output_png)
     check("pack_finished", result == {"FINISHED"}, str(result))
 
     generated_image = base_color_link(material).image
@@ -327,7 +327,7 @@ def test_pack_and_external_png():
     check("pack_packed_file_present", generated_image.packed_file is not None)
     check("pack_external_png_kept", os.path.isfile(output_png) and os.path.getsize(output_png) > 0)
 
-    status = bpy.context.scene.stylized_texture_last_status.lower()
+    status = bpy.context.scene.stylizetex_last_status.lower()
     check("pack_status_mentions_packed", "packed" in status, status)
     check("pack_status_mentions_blend", ".blend" in status, status)
 
@@ -339,23 +339,23 @@ def test_unsaved_blend_and_rollbacks():
 
     # Packing succeeds in an unsaved .blend and reports the save reminder.
     obj, image, material = build_scene("Unsaved")
-    settings = bpy.context.scene.stylized_texture_settings
+    settings = bpy.context.scene.stylizetex_settings
     settings.apply_to_material = True
     settings.pack_output = True
-    output_png = process_to_temp(obj, "stylized_materials_unsaved_")
-    result = bpy.ops.stylized_texture.process_texture(filepath=output_png)
+    output_png = process_to_temp(obj, "stylizetex_materials_unsaved_")
+    result = bpy.ops.stylizetex.process_texture(filepath=output_png)
     check("unsaved_pack_finished", result == {"FINISHED"}, str(result))
     check("unsaved_pack_packed_file", base_color_link(material).image.packed_file is not None)
     check(
         "unsaved_pack_save_reminder",
-        "save the .blend" in bpy.context.scene.stylized_texture_last_status.lower(),
-        bpy.context.scene.stylized_texture_last_status,
+        "save the .blend" in bpy.context.scene.stylizetex_last_status.lower(),
+        bpy.context.scene.stylizetex_last_status,
     )
 
     # Pack failure: roll back the new image, leave the material untouched.
     reset_datablocks()
     obj, image, material = build_scene("PackFail")
-    settings = bpy.context.scene.stylized_texture_settings
+    settings = bpy.context.scene.stylizetex_settings
     settings.apply_to_material = True
     settings.pack_output = True
     node_tree = material.node_tree
@@ -370,7 +370,7 @@ def test_unsaved_blend_and_rollbacks():
 
     images_mod.pack_image = failing_pack
     try:
-        output_png = process_to_temp(obj, "stylized_materials_packfail_")
+        output_png = process_to_temp(obj, "stylizetex_materials_packfail_")
         result = call_expect_cancelled(filepath=output_png)
     finally:
         images_mod.pack_image = original_pack
@@ -384,7 +384,7 @@ def test_unsaved_blend_and_rollbacks():
     # Apply failure: roll back the new image, leave the material untouched.
     reset_datablocks()
     obj, image, material = build_scene("ApplyFail")
-    settings = bpy.context.scene.stylized_texture_settings
+    settings = bpy.context.scene.stylizetex_settings
     settings.apply_to_material = True
     settings.pack_output = False
     node_tree = material.node_tree
@@ -399,7 +399,7 @@ def test_unsaved_blend_and_rollbacks():
 
     materials_mod.apply_generated_image = failing_apply
     try:
-        output_png = process_to_temp(obj, "stylized_materials_applyfail_")
+        output_png = process_to_temp(obj, "stylizetex_materials_applyfail_")
         result = call_expect_cancelled(filepath=output_png)
     finally:
         materials_mod.apply_generated_image = original_apply
@@ -511,8 +511,8 @@ def test_internal_rollback_reused_node_restores_props():
     source_node_name = base_color_link(material).name
 
     # First real run creates and applies the marked generated node.
-    first_png = process_to_temp(obj, "stylized_materials_internal_reuse_")
-    result = bpy.ops.stylized_texture.process_texture(filepath=first_png)
+    first_png = process_to_temp(obj, "stylizetex_materials_internal_reuse_")
+    result = bpy.ops.stylizetex.process_texture(filepath=first_png)
     check("internal_reuse_first_finished", result == {"FINISHED"}, str(result))
 
     generated_node = base_color_link(material)
@@ -555,7 +555,7 @@ def test_internal_rollback_reused_node_restores_props():
 
 
 def main() -> int:
-    import stylized_texture_addon as addon
+    import stylizetex as addon
 
     bpy.ops.wm.read_factory_settings(use_empty=True)
     addon.register()

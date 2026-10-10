@@ -35,7 +35,7 @@ DEFAULTS = {
 }
 
 
-class StylizedTextureSettings(bpy.types.PropertyGroup):
+class StylizeTexSettings(bpy.types.PropertyGroup):
     output_resolution: EnumProperty(
         name="Resolution",
         description="Output texture resolution (longest side)",
@@ -144,20 +144,20 @@ class StylizedTextureSettings(bpy.types.PropertyGroup):
     )
 
 
-classes = (StylizedTextureSettings,)
+classes = (StylizeTexSettings,)
 
 
 def register_scene_properties() -> None:
-    bpy.types.Scene.stylized_texture_settings = bpy.props.PointerProperty(
-        type=StylizedTextureSettings
+    bpy.types.Scene.stylizetex_settings = bpy.props.PointerProperty(
+        type=StylizeTexSettings
     )
-    bpy.types.Scene.stylized_texture_last_output = StringProperty(
+    bpy.types.Scene.stylizetex_last_output = StringProperty(
         name="Last Stylized Output",
         description="Path of the most recently saved stylized texture",
         subtype="FILE_PATH",
         default="",
     )
-    bpy.types.Scene.stylized_texture_last_status = StringProperty(
+    bpy.types.Scene.stylizetex_last_status = StringProperty(
         name="Last Stylized Status",
         description="Short status of the most recent processing run",
         default="",
@@ -165,15 +165,15 @@ def register_scene_properties() -> None:
 
 
 def unregister_scene_properties() -> None:
-    if hasattr(bpy.types.Scene, "stylized_texture_settings"):
-        del bpy.types.Scene.stylized_texture_settings
-    if hasattr(bpy.types.Scene, "stylized_texture_last_output"):
-        del bpy.types.Scene.stylized_texture_last_output
-    if hasattr(bpy.types.Scene, "stylized_texture_last_status"):
-        del bpy.types.Scene.stylized_texture_last_status
+    if hasattr(bpy.types.Scene, "stylizetex_settings"):
+        del bpy.types.Scene.stylizetex_settings
+    if hasattr(bpy.types.Scene, "stylizetex_last_output"):
+        del bpy.types.Scene.stylizetex_last_output
+    if hasattr(bpy.types.Scene, "stylizetex_last_status"):
+        del bpy.types.Scene.stylizetex_last_status
 
 
-def reset_settings(settings: StylizedTextureSettings) -> None:
+def reset_settings(settings: StylizeTexSettings) -> None:
     """Reset recognized settings to their defaults (tolerant to missing fields)."""
 
     for name, value in DEFAULTS.items():

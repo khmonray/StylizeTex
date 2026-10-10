@@ -22,12 +22,12 @@ from __future__ import annotations
 from .validation import get_principled_bsdf
 
 # Custom-property keys used to identify our generated data-blocks.
-GENERATED_NODE_MARKER = "stylized_texture_generated_node"
-SOURCE_NODE_MARKER = "stylized_texture_source_node"
-SOURCE_IMAGE_MARKER = "stylized_texture_source_image"
-GENERATED_IMAGE_MARKER = "stylized_texture_generated_image"
+GENERATED_NODE_MARKER = "stylizetex_generated_node"
+SOURCE_NODE_MARKER = "stylizetex_source_node"
+SOURCE_IMAGE_MARKER = "stylizetex_source_image"
+GENERATED_IMAGE_MARKER = "stylizetex_generated_image"
 
-GENERATED_NODE_NAME = "StylizedTexture_Generated"
+GENERATED_NODE_NAME = "StylizeTex_Generated"
 
 
 def is_generated_node(node) -> bool:
@@ -243,7 +243,7 @@ def apply_generated_image(material, generated_image, source_node, source_image):
         if node is None:
             node = node_tree.nodes.new("ShaderNodeTexImage")
             node.name = GENERATED_NODE_NAME
-            node.label = "Stylized Texture (generated)"
+            node.label = "StylizeTex (generated)"
 
         node.image = generated_image
         node[GENERATED_NODE_MARKER] = True
