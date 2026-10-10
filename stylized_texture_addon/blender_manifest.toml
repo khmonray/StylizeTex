@@ -1,0 +1,16 @@
+# Blender extension manifest.
+# See: https://docs.blender.org/manual/en/latest/extensions/index.html
+schema_version = "1.0.0"
+
+id = "stylized_texture_addon"
+version = "0.3.0"
+name = "Stylized Texture Processor"
+tagline = "Turn Base Color textures into a stylized, hand-painted look"
+maintainer = "github.com/khmonray"
+type = "add-on"
+blender_version_min = "4.2.0"
+license = ["SPDX:GPL-3.0-or-later"]
+tags = ["Material", "Paint"]
+
+[permissions]
+files = "Save stylized PNG textures to a folder selected by the user"

@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+
+# Excluded local files
+/.*/
+/*.json
+AGENTS.md
+document.txt
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Tooling / editor
+.idea/
+.vscode/
+.DS_Store
+
+# Generated local scratch (if any)
+*.tmp
